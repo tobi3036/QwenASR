@@ -4,21 +4,26 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-/// Files that make up the Qwen3-ASR 0.6B model. Mirrors the CLI download list
-/// in `crates/qwen-asr-cli/src/download.rs`.
+/// Files required for Qwen3-ASR 1.7B.
 const List<String> kModelFiles = [
-  'model.safetensors',
+  'model-00001-of-00002.safetensors',
+  'model-00002-of-00002.safetensors',
+  'model.safetensors.index.json',
+  'config.json',
+  'generation_config.json',
+  'preprocessor_config.json',
+  'tokenizer_config.json',
   'vocab.json',
   'merges.txt',
+  'chat_template.json',
 ];
 
-/// Default download base URL (HuggingFace). The `resolve/main/<file>` pattern
-/// mirrors the CLI. Override in the UI to point at a local test server.
+/// Hugging Face download location.
 const String kDefaultBaseUrl =
-    'https://huggingface.co/Qwen/Qwen3-ASR-0.6B/resolve/main/';
+    'https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/main/';
 
-/// Model directory name inside the app documents directory.
-const String kModelDirName = 'qwen3-asr-0.6b';
+/// Model directory.
+const String kModelDirName = 'qwen3-asr-1.7b';
 
 /// Per-file download progress snapshot.
 class FileProgress {
