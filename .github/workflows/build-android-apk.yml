@@ -21,6 +21,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Extract uploaded project ZIP
+        run: |
+          ...
+          echo "PROJECT_DIR=$GITHUB_WORKSPACE/source/QwenASR-main" >> "$GITHUB_ENV"
+
+      - name: Bump AGP to 9.1.1
+        run: |
+          F="$PROJECT_DIR/flutter/qwen_asr/example/android/settings.gradle.kts"
+          sed -i -E 's/(id\("com\.android\.application"\) version ")[0-9.]+(")/\19.1.1\2/' "$F"
+          grep -n "com.android.application" "$F"
+
+      - name: (whatever step came next)
         shell: bash
         run: |
           ZIP_FILE="$GITHUB_WORKSPACE/QwenASR-1.7B-android-build-ready.zip"
