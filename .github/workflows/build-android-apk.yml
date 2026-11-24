@@ -149,6 +149,18 @@ jobs:
         working-directory: ${{ github.workspace }}/source/QwenASR-main/flutter/qwen_asr/example
         run: flutter pub get
 
+      - name: Patch plugins for built-in Kotlin
+        run: |
+          for f in $(grep -rlE "kotlin-android|org\.jetbrains\.kotlin\.android" \
+              "$PROJECT_DIR/flutter/qwen_asr/android" "$PUB_CACHE/hosted" \
+              --include=build.gradle --include=build.gradle.kts 2>/dev/null); do
+            echo "Patching $f"
+            sed -i -E '/kotlin-android|org\.jetbrains\.kotlin\.android/d' "$f"
+            perl -0pi -e 's/\n[ \t]*kotlinOptions[ \t]*\{[^}]*\}//g' "$f"
+          done
+          echo "=== qwen_asr android/build.gradle after patch ==="
+          cat "$PROJECT_DIR/flutter/qwen_asr/android/build.gradle"
+
       - name: Build release APK
         working-directory: ${{ github.workspace }}/source/QwenASR-main/flutter/qwen_asr/example
         run: flutter build apk --release --target-platform android-arm64 --verbose
