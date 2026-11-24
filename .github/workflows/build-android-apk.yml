@@ -47,6 +47,12 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # Override the action's legacy default package list. The old
+          # standalone "tools" package is no longer available from Google.
+          packages: |
+            platform-tools
+            platforms;android-36
 
       - name: Install Android NDK
         run: |
