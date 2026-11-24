@@ -88,10 +88,10 @@ jobs:
           mkdir -p /tmp/gradle-wrapper-project
           printf "rootProject.name = 'wrapper-generator'\n" > /tmp/gradle-wrapper-project/settings.gradle
           : > /tmp/gradle-wrapper-project/build.gradle
-          curl -fsSLo /tmp/gradle.zip https://services.gradle.org/distributions/gradle-8.14-bin.zip
+          curl -fsSLo /tmp/gradle.zip https://services.gradle.org/distributions/gradle-9.3.1-bin.zip
           unzip -q /tmp/gradle.zip -d /tmp
           cd /tmp/gradle-wrapper-project
-          /tmp/gradle-8.14/bin/gradle wrapper --gradle-version 8.14 --distribution-type all
+          /tmp/gradle-9.3.1/bin/gradle wrapper --gradle-version 9.3.1 --distribution-type all
           ANDROID_DIR="$PROJECT_DIR/flutter/qwen_asr/example/android"
           mkdir -p "$ANDROID_DIR/gradle/wrapper"
           cp gradlew gradlew.bat "$ANDROID_DIR/"
