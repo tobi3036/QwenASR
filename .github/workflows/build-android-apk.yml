@@ -22,7 +22,16 @@ jobs:
 
       - name: Extract uploaded project ZIP
         run: |
-          ...
+          ZIP_FILE="$GITHUB_WORKSPACE/QwenASR-1.7B-android-build-ready.zip"
+          if [ ! -f "$ZIP_FILE" ]; then
+            echo "Could not find $ZIP_FILE in the repository root."
+            ls -la "$GITHUB_WORKSPACE"
+            exit 1
+          fi
+          mkdir -p "$GITHUB_WORKSPACE/source"
+          unzip -q "$ZIP_FILE" -d "$GITHUB_WORKSPACE/source"
+          test -d "$GITHUB_WORKSPACE/source/QwenASR-main"
+          echo "PROJECT_DIR=$GITHUB_WORKSPACE/source/QwenASR-main" >> "$GITHUB_ENV"
           echo "PROJECT_DIR=$GITHUB_WORKSPACE/source/QwenASR-main" >> "$GITHUB_ENV"
 
       - name: Bump AGP to 9.1.1
