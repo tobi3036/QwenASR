@@ -50,12 +50,14 @@ jobs:
         with:
           # Override the action's legacy default package list. The old
           # standalone "tools" package is no longer available from Google.
-          packages: 'platform-tools,platforms;android-36'
+          packages: |
+            platform-tools
+            platforms;android-36
 
       - name: Install Android NDK
         run: |
           yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "platforms;android-36" "ndk;27.0.12077973"
+          sdkmanager "ndk;27.0.12077973"
           echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> "$GITHUB_ENV"
           echo "ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> "$GITHUB_ENV"
 
