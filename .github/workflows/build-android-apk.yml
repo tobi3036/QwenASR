@@ -79,8 +79,6 @@ jobs:
           sed -i '/^android.newDsl=false/d;/^android.builtInKotlin=false/d' gradle.properties
           printf '\nandroid.builtInKotlin=true\n' >> gradle.properties
           sed -i '/org.jetbrains.kotlin.android/d' settings.gradle.kts
-          echo "=== gradle.properties ==="; cat gradle.properties
-          echo "=== settings.gradle.kts ==="; cat settings.gradle.kts
 
       - name: Set up Java 17
         uses: actions/setup-java@v5
@@ -97,7 +95,6 @@ jobs:
       - name: Install Android SDK packages
         run: |
           SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
-          echo "Using Android SDK at: $SDK_ROOT"
           echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
           echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
 
@@ -107,10 +104,8 @@ jobs:
           fi
           if [ -z "$SDKMANAGER" ] || [ ! -x "$SDKMANAGER" ]; then
             echo "Could not locate sdkmanager under $SDK_ROOT/cmdline-tools"
-            find "$SDK_ROOT" -maxdepth 4 -type f -name sdkmanager -print || true
             exit 1
           fi
-          echo "Using sdkmanager: $SDKMANAGER"
 
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" --install \
@@ -158,8 +153,6 @@ jobs:
             sed -i -E '/kotlin-android|org\.jetbrains\.kotlin\.android/d' "$f"
             perl -0pi -e 's/\n[ \t]*kotlinOptions[ \t]*\{[^}]*\}//g' "$f"
           done
-          echo "=== qwen_asr android/build.gradle after patch ==="
-          cat "$PROJECT_DIR/flutter/qwen_asr/android/build.gradle"
 
       - name: Patch cargokit for Gradle 9
         run: |
@@ -168,9 +161,10 @@ jobs:
             grep -q "org.gradle.process.ExecOperations" "$f" || \
               sed -i '1i import javax.inject.Inject\nimport org.gradle.process.ExecOperations' "$f"
             perl -0pi -e 's/(?:abstract\s+)?class\s+CargoKitBuildTask(\s+extends\s+\w+)?\s*\{/abstract class CargoKitBuildTask$1 {\n    \@Inject\n    abstract ExecOperations getExecOperations()\n/; s/\bproject\.exec\s*\{/getExecOperations().exec {/g; s/(?<![\w.])exec\s*\{/getExecOperations().exec {/g' "$f"
-            echo "=== $f after patch ==="
-            cat "$f"
           done
+
+      - name: Isolate Rust crate from repo workspace
+        run: printf '\n[workspace]\n' >> "$PROJECT_DIR/flutter/qwen_asr/rust/Cargo.toml"
 
       - name: Build release APK
         working-directory: ${{ github.workspace }}/source/QwenASR-main/flutter/qwen_asr/example
