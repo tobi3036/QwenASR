@@ -161,6 +161,17 @@ jobs:
           echo "=== qwen_asr android/build.gradle after patch ==="
           cat "$PROJECT_DIR/flutter/qwen_asr/android/build.gradle"
 
+      - name: Patch cargokit for Gradle 9
+        run: |
+          for f in $(find "$PROJECT_DIR" "$PUB_CACHE/hosted" -path "*cargokit/gradle/plugin.gradle" 2>/dev/null); do
+            echo "Patching $f"
+            grep -q "org.gradle.process.ExecOperations" "$f" || \
+              sed -i '1i import javax.inject.Inject\nimport org.gradle.process.ExecOperations' "$f"
+            perl -0pi -e 's/(?:abstract\s+)?class\s+CargoKitBuildTask(\s+extends\s+\w+)?\s*\{/abstract class CargoKitBuildTask$1 {\n    \@Inject\n    abstract ExecOperations getExecOperations()\n/; s/\bproject\.exec\s*\{/getExecOperations().exec {/g; s/(?<![\w.])exec\s*\{/getExecOperations().exec {/g' "$f"
+            echo "=== $f after patch ==="
+            cat "$f"
+          done
+
       - name: Build release APK
         working-directory: ${{ github.workspace }}/source/QwenASR-main/flutter/qwen_asr/example
         run: flutter build apk --release --target-platform android-arm64 --verbose
