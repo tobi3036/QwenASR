@@ -35,7 +35,7 @@ jobs:
       - name: Migrate Android build files to AGP 9
         run: |
           cd "$PROJECT_DIR/flutter/qwen_asr/example/android"
-          cat > app/build.gradle.kts <<'EOF'
+          cat > app/build.gradle.kts <<'EOT'
           plugins {
               id("com.android.application")
               id("dev.flutter.flutter-gradle-plugin")
@@ -75,7 +75,7 @@ jobs:
           flutter {
               source = "../.."
           }
-          EOF
+          EOT
           sed -i '/^android.newDsl=false/d;/^android.builtInKotlin=false/d' gradle.properties
           printf '\nandroid.builtInKotlin=true\n' >> gradle.properties
           sed -i '/org.jetbrains.kotlin.android/d' settings.gradle.kts
@@ -143,6 +143,23 @@ jobs:
       - name: Resolve Flutter dependencies
         working-directory: ${{ github.workspace }}/source/QwenASR-main/flutter/qwen_asr/example
         run: flutter pub get
+
+      - name: Cache flutter_rust_bridge_codegen
+        id: frb-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/flutter_rust_bridge_codegen
+          key: frb-codegen-2.11.1-${{ runner.os }}
+
+      - name: Install flutter_rust_bridge_codegen
+        if: steps.frb-cache.outputs.cache-hit != 'true'
+        run: cargo install flutter_rust_bridge_codegen --version 2.11.1 --locked
+
+      - name: Regenerate Flutter-Rust bindings
+        working-directory: ${{ github.workspace }}/source/QwenASR-main/flutter/qwen_asr
+        run: |
+          flutter pub get
+          flutter_rust_bridge_codegen generate
 
       - name: Patch plugins for built-in Kotlin
         run: |
