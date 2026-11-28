@@ -14,7 +14,7 @@ jobs:
 
       - name: Extract uploaded project ZIP
         run: |
-          ZIP_FILE="$GITHUB_WORKSPACE/QwenASR-1.7B-android-build-ready.zip"
+          ZIP_FILE="$GITHUB_WORKSPACE/QwenASR-1.7B-android-build-ready (1).zip"
           if [ ! -f "$ZIP_FILE" ]; then
             echo "Could not find $ZIP_FILE in the repository root."
             ls -la "$GITHUB_WORKSPACE"
